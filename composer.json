@@ -1,0 +1,23 @@
+{
+  "name":        "cubex/redis",
+  "description": "Cubex Redis components",
+  "version":     "1.0.0",
+  "keywords":    ["cubex", "redis"],
+  "homepage":    "http://cubex.io",
+  "authors": [
+    {
+      "name":     "Richard Gooding",
+      "email":    "richard.gooding@justdevelop.it"
+    }
+  ],
+  "require": {
+    "php":           ">=5.4.0",
+    "predis/predis": "*"
+  },
+  "autoload": {
+    "psr-0": {
+      "Redis\\":"src/"
+    }
+  },
+  "minimum-stability": "dev"
+}
