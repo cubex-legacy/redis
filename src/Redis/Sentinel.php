@@ -29,13 +29,21 @@ class Sentinel
 
     foreach($hosts as $host)
     {
-      if(strpos($host, ':') !== false)
+      if(is_array($host) && isset($host['host']))
       {
-        list($host, $port) = explode(":", $host);
+        $host = $host['host'];
+        $port = empty($host['port']) ? static::DEFAULT_PORT : $host['port'];
       }
       else
       {
-        $port = static::DEFAULT_PORT;
+        if(strpos($host, ':') !== false)
+        {
+          list($host, $port) = explode(":", $host);
+        }
+        else
+        {
+          $port = static::DEFAULT_PORT;
+        }
       }
       $this->_hosts[] = ['host' => $host, 'port' => $port];
     }
