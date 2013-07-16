@@ -61,7 +61,6 @@ class Sentinel
     // Connect to a random host
     while(! $this->_connected)
     {
-      echo ".";
       $hostIdx = rand(0, count($this->_hosts) - 1);
       $host = $this->_hosts[$hostIdx];
 
@@ -73,8 +72,6 @@ class Sentinel
       {
         $this->_socket = $sock;
         $this->_connected = true;
-
-        echo "Connected to " . $host['host'] . "\n";
       }
       else
       {
