@@ -5,6 +5,6 @@
 
 namespace Redis;
 
-class RedisSentinelException extends \Exception
+class SentinelException extends \Exception
 {
 }

@@ -81,7 +81,7 @@ class Sentinel
         unset($this->_hosts[$hostIdx]);
         if(count($this->_hosts) == 0)
         {
-          throw new RedisSentinelException(
+          throw new SentinelException(
             'Error connecting to Redis Sentinel: Could not connect to any hosts'
           );
         }
@@ -113,7 +113,7 @@ class Sentinel
   {
     if(! $this->_connected)
     {
-      throw new RedisSentinelException('Not connected');
+      throw new SentinelException('Not connected');
     }
     fputs($this->_socket, trim($message) . "\r\n");
   }
@@ -122,7 +122,7 @@ class Sentinel
   {
     if(! $this->_connected)
     {
-      throw new RedisSentinelException('Not connected');
+      throw new SentinelException('Not connected');
     }
 
     $data = "";
