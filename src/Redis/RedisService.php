@@ -31,6 +31,9 @@ class RedisService implements IService
   const DEFAULT_REDIS_PORT = 6379;
   const DEFAULT_SENTINEL_PORT = 26379;
 
+  const SENTINEL_CACHE_FILE = '/dev/shm/cubex-redis-sentinel-cache';
+  const USE_SENTINEL_CACHE = true;
+
   /**
    * @var Client
    */
@@ -110,31 +113,47 @@ class RedisService implements IService
     Sentinel $sentinel, array $options = []
   )
   {
-    $masters = $sentinel->masters();
-    if((count($masters) > 0) &&
-      isset($masters[0]['name']) &&
-      isset($masters[0]['ip']) &&
-      isset($masters[0]['port']))
+    if(self::USE_SENTINEL_CACHE
+      && file_exists(self::SENTINEL_CACHE_FILE)
+      && (filemtime(self::SENTINEL_CACHE_FILE) > (time() - 60))
+    )
     {
-      $hosts = [
-        [
-          'host' => $masters[0]['ip'],
-          'port' => $masters[0]['port'],
-          'alias' => 'master'
-        ]
-      ];
-      $slaves = $sentinel->slaves($masters[0]['name']);
-      foreach($slaves as $slave)
-      {
-        $hosts[] = ['host' => $slave['ip'], 'port' => $slave['port']];
-      }
-
-      $options = array_merge($options, ['replication' => true]);
-      return new Client($hosts, $options);
+      $hosts = unserialize(file_get_contents(self::SENTINEL_CACHE_FILE));
     }
     else
     {
-      throw new \Exception('No master servers found');
+      $masters = $sentinel->masters();
+      if((count($masters) > 0) &&
+        isset($masters[0]['name']) &&
+        isset($masters[0]['ip']) &&
+        isset($masters[0]['port'])
+      )
+      {
+        $hosts  = [
+          [
+            'host'  => $masters[0]['ip'],
+            'port'  => $masters[0]['port'],
+            'alias' => 'master'
+          ]
+        ];
+        $slaves = $sentinel->slaves($masters[0]['name']);
+        foreach($slaves as $slave)
+        {
+          $hosts[] = ['host' => $slave['ip'], 'port' => $slave['port']];
+        }
+
+        if(self::USE_SENTINEL_CACHE)
+        {
+          file_put_contents(self::SENTINEL_CACHE_FILE, serialize($hosts));
+        }
+      }
+      else
+      {
+        throw new \Exception('No master servers found');
+      }
     }
+
+    $options = array_merge($options, ['replication' => true]);
+    return new Client($hosts, $options);
   }
 }
