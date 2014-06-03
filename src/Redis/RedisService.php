@@ -133,13 +133,20 @@ class RedisService implements IService
           [
             'host'  => $masters[0]['ip'],
             'port'  => $masters[0]['port'],
-            'alias' => 'master'
+            'alias' => 'master',
+            'persistent' => true,
+            //'async_connect' => true
           ]
         ];
         $slaves = $sentinel->slaves($masters[0]['name']);
         foreach($slaves as $slave)
         {
-          $hosts[] = ['host' => $slave['ip'], 'port' => $slave['port']];
+          $hosts[] = [
+            'host' => $slave['ip'],
+            'port' => $slave['port'],
+            'persistent' => true,
+            //'async_connect' => true
+          ];
         }
 
         if(self::USE_SENTINEL_CACHE)

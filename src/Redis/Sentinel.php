@@ -72,9 +72,14 @@ class Sentinel
       $hostIdx = rand(0, count($this->_hosts) - 1);
       $host = $this->_hosts[$hostIdx];
 
-      $sock = fsockopen(
-        $host['host'], $host['port'], $errno, $errstr, static::CONNECT_TIMEOUT
+      $sock = stream_socket_client(
+        'tcp://' . $host['host'] . ':' . $host['port'] . '/sentinelpersist',
+        $errno, $errstr, static::CONNECT_TIMEOUT,
+        STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT
       );
+      /*$sock = fsockopen(
+        $host['host'], $host['port'], $errno, $errstr, static::CONNECT_TIMEOUT
+      );*/
 
       if($sock)
       {
